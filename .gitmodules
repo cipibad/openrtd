@@ -1,0 +1,3 @@
+[submodule "toolchain_mips"]
+	path = toolchain_mips
+	url = git@github.com:cipibad/toolchain_mipsel.git
