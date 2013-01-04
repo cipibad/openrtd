@@ -669,6 +669,12 @@ config BR2_TOOLCHAIN_EXTERNAL_PATH
 	help
 	  Path to where the external toolchain is installed.
 
+config BR2_TOOLCHAIN_EXTERNAL_SUPPORTS_SYSROOT
+	bool "Toolchain supports sysroot"
+	depends on BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED
+	help
+	  Select this only if external toolchain supports sysroot
+
 config BR2_TOOLCHAIN_EXTERNAL_URL
 	string "Toolchain URL"
 	depends on BR2_TOOLCHAIN_EXTERNAL_CUSTOM && BR2_TOOLCHAIN_EXTERNAL_DOWNLOAD

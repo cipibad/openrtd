@@ -1,0 +1,14 @@
+--- php-5.3.20-original/ext/standard/php_crypt_r.c	2013-01-05 00:11:18.012888817 +0200
++++ php-5.3.20/ext/standard/php_crypt_r.c	2013-01-05 00:11:58.300886995 +0200
+@@ -97,9 +97,11 @@
+ #elif defined(HAVE_SYNC_FETCH_AND_ADD)
+ 		__sync_fetch_and_add(&initialized, 1);
+ #elif defined(HAVE_ATOMIC_H) /* Solaris 10 defines atomic API within */
++#if (defined(__GNUC__) && (__GNUC__ >= 4 && __GNUC_MINOR__ >= 1))
+ 		membar_producer();
+ 		atomic_add_int(&initialized, 1);
+ #endif
++#endif
+ 		_crypt_extended_init();
+ 	}
+ #ifdef ZTS

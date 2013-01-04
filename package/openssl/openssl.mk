@@ -13,6 +13,10 @@ OPENSSL_DEPENDENCIES = zlib
 OPENSSL_TARGET_ARCH = generic32
 OPENSSL_CFLAGS = $(TARGET_CFLAGS)
 
+ifneq ($(BR2_TOOLCHAIN_EXTERNAL_SUPPORTS_SYSROOT),y)
+OPENSSL_CFLAGS += -I$(STAGING_DIR)/usr/include
+endif
+
 ifeq ($(BR2_PACKAGE_OPENSSL_BIN),)
 define OPENSSL_DISABLE_APPS
 	$(SED) '/^build_apps/! s/build_apps//' $(@D)/Makefile.org

@@ -21,7 +21,9 @@ static char path[PATH_MAX] = BR_CROSS_PATH;
 
 static char *predef_args[] = {
 	path,
+#ifdef BR2_TOOLCHAIN_EXTERNAL_SUPPORTS_SYSROOT
 	"--sysroot", BR_SYSROOT,
+#endif	/* defined BR2_TOOLCHAIN_EXTERNAL_SUPPORTS_SYSROOT */ 
 #ifdef BR_ARCH
 	"-march=" BR_ARCH,
 #endif /* BR_ARCH */

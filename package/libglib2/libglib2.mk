@@ -44,6 +44,11 @@ LIBGLIB2_CONF_ENV = \
 		ac_cv_func_printf_unix98=yes ac_cv_func_vsnprintf_c99=yes \
 		gt_cv_c_wchar_t=$(if $(BR2_USE_WCHAR),yes,no)
 
+
+ifneq ($(BR2_TOOLCHAIN_EXTERNAL_SUPPORTS_SYSROOT),y)
+LIBGLIB2_CONF_ENV += CFLAGS+=-I$(STAGING_DIR)/usr/include  LDFLAGS+=-L$(STAGING_DIR)/usr/lib
+endif
+
 # old uClibc versions don't provide qsort_r
 ifeq ($(BR2_UCLIBC_VERSION_0_9_31)$(BR2_UCLIBC_VERSION_0_9_32)$(BR2_TOOLCHAIN_CTNG_uClibc)$(BR2_TOOLCHAIN_EXTERNAL_UCLIBC),y)
 LIBGLIB2_CONF_ENV += glib_cv_have_qsort_r=no
