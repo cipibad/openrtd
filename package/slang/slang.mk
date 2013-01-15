@@ -51,4 +51,5 @@ define SLANG_CLEAN_CMDS
 	$(MAKE) -C $(@D) clean
 endef
 
+$(eval $(host-generic-package))
 $(eval $(generic-package))
