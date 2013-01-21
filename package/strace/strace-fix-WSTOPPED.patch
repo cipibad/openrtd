@@ -1,0 +1,12 @@
+--- a/strace.c
++++ b/strace.c
+@@ -1119,6 +1119,9 @@
+ 			if (!strace_vforked) {
+ 				/* Wait until child stopped itself */
+ 				int status;
++#ifndef WSTOPPED
++#define WSTOPPED 2
++#endif
+ 				while (waitpid(pid, &status, WSTOPPED) < 0) {
+ 					if (errno == EINTR)
+ 						continue;
