@@ -1,10 +1,10 @@
-#############################################################
+################################################################################
 #
 # samba
 #
-#############################################################
+################################################################################
 
-SAMBA_VERSION = 3.6.10
+SAMBA_VERSION = 3.6.23
 SAMBA_SITE = http://ftp.samba.org/pub/samba/stable
 SAMBA_SUBDIR = source3
 SAMBA_INSTALL_STAGING = YES
@@ -64,11 +64,6 @@ SAMBA_INSTALL_TARGET_OPT = \
 	DESTDIR=$(TARGET_DIR) -C $(SAMBA_DIR)/$(SAMBA_SUBDIR) \
 	installlibs installservers installbin installscripts \
 	$(if $(BR2_PACKAGE_SAMBA_SWAT),installswat)
-
-SAMBA_UNINSTALL_TARGET_OPT = \
-	DESTDIR=$(TARGET_DIR) -C $(SAMBA_DIR)/$(SAMBA_SUBDIR) \
-	uninstalllibs uninstallservers uninstallbin uninstallscripts \
-	$(if $(BR2_PACKAGE_SAMBA_SWAT),uninstallswat)
 
 # binaries to keep
 SAMBA_BINTARGETS_y = \
@@ -158,10 +153,11 @@ else
 SAMBA_CONF_OPT += --with-libiconv=""
 endif
 
+# Compiled debug messages by level
+SAMBA_CONF_OPT += CFLAGS="$(TARGET_CFLAGS) -DMAX_DEBUG_LEVEL=$(BR2_PACKAGE_SAMBA_MAX_DEBUGLEVEL)"
+
 ifeq ($(BR2_PACKAGE_SAMBA_SWAT),y)
-ifneq ($(BR2_HAVE_DOCUMENTATION),y)
 SAMBA_POST_INSTALL_TARGET_HOOKS += SAMBA_REMOVE_SWAT_DOCUMENTATION
-endif
 endif
 
 define SAMBA_INSTALL_INITSCRIPTS_CONFIG

@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # makedevs
 #
-#############################################################
+################################################################################
 
 # source included in buildroot
 MAKEDEVS_SOURCE =
@@ -16,11 +16,6 @@ endef
 define MAKEDEVS_INSTALL_TARGET_CMDS
 	install -D -m 755 $(@D)/makedevs $(TARGET_DIR)/usr/sbin/makedevs
 endef
-
-define MAKEDEVS_UNINSTALL_TARGET_CMDS
-	rm -f $(TARGET_DIR)/usr/sbin/makedevs
-endef
-
 
 define HOST_MAKEDEVS_BUILD_CMDS
 	$(HOSTCC) $(HOST_CFLAGS) $(HOST_LDFLAGS) \

@@ -1,7 +1,7 @@
 // -*- mode:doc; -*-
+// vim: set syntax=asciidoc:
 
-Using Buildroot
----------------
+== Using Buildroot
 
 Buildroot has a nice configuration tool similar to the one you can
 find in the http://www.kernel.org/[Linux kernel] or in
@@ -14,7 +14,13 @@ assistant:
  $ make menuconfig
 --------------------
 
-to run the curses-based configurator, or
+or
+
+--------------------
+ $ make nconfig
+--------------------
+
+to run the old or new curses-based configurator, or
 
 --------------------
  $ make xconfig
@@ -68,8 +74,8 @@ This directory contains several subdirectories:
 * +images/+ where all the images (kernel image, bootloader and root
   filesystem images) are stored.
 
-* +build/+ where all the components except for the cross-compilation
-  toolchain are built (this includes tools needed to run Buildroot on
+* +build/+ where all the components are built
+  (this includes tools needed to run Buildroot on
   the host and packages compiled for the target). The +build/+
   directory contains one subdirectory for each of these components.
 
@@ -101,10 +107,7 @@ This directory contains several subdirectories:
   that are needed for the proper execution of Buildroot, including the
   cross-compilation toolchain.
 
-* +toolchain/+ contains the build directories for the various
-  components of the cross-compilation toolchain.
-
-These commands, +make menuconfig|gconfig|xconfig+ and +make+, are the
+These commands, +make menuconfig|nconfig|gconfig|xconfig+ and +make+, are the
 basic ones that allow to easily and quickly generate images fitting
 your needs, with all the supports and applications you enabled.
 

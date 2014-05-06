@@ -1,8 +1,8 @@
-// -*- mode:doc -*- ;
+// -*- mode:doc; -*-
+// vim: set syntax=asciidoc:
 
 [[requirement]]
-System requirements
--------------------
+== System requirements
 
 Buildroot is designed to run on Linux systems.
 
@@ -16,8 +16,7 @@ for the libraries that may be packaged in 2 distinct packages.
 
 [[requirement-mandatory]]
 
-Mandatory packages
-~~~~~~~~~~~~~~~~~~
+=== Mandatory packages
 
 * Build tools:
 
@@ -29,34 +28,28 @@ Mandatory packages
 ** +gcc+ (version 2.95 or any later)
 ** `g++` (version 2.95 or any later)
 ** +bash+
-** +gawk+
-** +bison+
-** +flex+
-** +gettext+
 ** +patch+
 ** +gzip+
 ** +bzip2+
-** +perl+
+** +perl+ (version 5.8.7 or any later)
 ** +tar+
 ** +cpio+
 ** +python+ (version 2.6 or 2.7)
 ** +unzip+
 ** +rsync+
-** +texinfo+ (required for internal Buildroot toolchain backend)
 
 * Source fetching tools:
 ** +wget+
 
 [[requirement-optional]]
 
-Optional packages
-~~~~~~~~~~~~~~~~~
+=== Optional packages
 
 * Source fetching tools:
 +
 In the official tree, most of the package sources are retrieved
 using +wget+; a few are only available through their +git+, +mercurial+,
-or +svn+ repository.
++svn+ or +cvs+ repository.
 +
 All other source fetching methods are implemented and may be used in a
 development context (further details: refer to xref:download-infra[]).
@@ -80,4 +73,7 @@ development context (further details: refer to xref:download-infra[]).
 ** The +jar+ tool
 
 * Documentation generation tools:
-** +asciidoc+
+** +asciidoc+, version 8.6.3 or higher
+** +w3m+
+** +python+ with the +argparse+ module (automatically present in 2.7+ and 3.2+)
+** +dblatex+ (required for the pdf manual only)

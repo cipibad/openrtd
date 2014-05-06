@@ -1,11 +1,10 @@
-#############################################################
+################################################################################
 #
 # libseccomp
 #
-#############################################################
+################################################################################
 
 LIBSECCOMP_VERSION         = 1.0.0
-LIBSECCOMP_SOURCE          = libseccomp-$(LIBSECCOMP_VERSION).tar.gz
 LIBSECCOMP_SITE            = http://downloads.sourceforge.net/project/libseccomp
 LIBSECCOMP_LICENSE         = LGPLv2.1
 LIBSECCOMP_LICENSE_FILES   = LICENSE

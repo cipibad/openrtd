@@ -1,14 +1,28 @@
 ################################################################################
 #
-# xlib_libX11 -- X.Org X11 library
+# xlib_libX11
 #
 ################################################################################
 
-XLIB_LIBX11_VERSION = 1.4.2
+XLIB_LIBX11_VERSION = 1.6.2
 XLIB_LIBX11_SOURCE = libX11-$(XLIB_LIBX11_VERSION).tar.bz2
 XLIB_LIBX11_SITE = http://xorg.freedesktop.org/releases/individual/lib
+XLIB_LIBX11_LICENSE = MIT
+XLIB_LIBX11_LICENSE_FILES = COPYING
 XLIB_LIBX11_INSTALL_STAGING = YES
-XLIB_LIBX11_DEPENDENCIES = libxcb xutil_util-macros xlib_xtrans xlib_libXau xlib_libXdmcp xproto_kbproto xproto_xproto xproto_xextproto xproto_inputproto xproto_xf86bigfontproto xproto_xcmiscproto host-xproto_xproto
+XLIB_LIBX11_DEPENDENCIES = \
+	libxcb \
+	xutil_util-macros \
+	xlib_xtrans \
+	xlib_libXau \
+	xlib_libXdmcp \
+	xproto_kbproto \
+	xproto_xproto \
+	xproto_xextproto \
+	xproto_inputproto \
+	xproto_xf86bigfontproto \
+	host-xproto_xproto
+
 XLIB_LIBX11_CONF_OPT = \
 	--disable-malloc0returnsnull \
 	--with-xcb \
@@ -29,6 +43,7 @@ define XLIB_LIBX11_DISABLE_MAKEKEYS_X11_CFLAGS
 endef
 
 XLIB_LIBX11_POST_PATCH_HOOKS += XLIB_LIBX11_DISABLE_MAKEKEYS_X11_CFLAGS
+HOST_XLIB_LIBX11_POST_PATCH_HOOKS += XLIB_LIBX11_DISABLE_MAKEKEYS_X11_CFLAGS
 
 $(eval $(autotools-package))
 $(eval $(host-autotools-package))

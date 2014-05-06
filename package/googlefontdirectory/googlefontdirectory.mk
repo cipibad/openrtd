@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # googlefontdirectory
 #
-#############################################################
+################################################################################
 
 GOOGLEFONTDIRECTORY_SITE = \
 	https://s3.amazonaws.com/joemaller_google_webfonts
@@ -18,10 +18,6 @@ define GOOGLEFONTDIRECTORY_INSTALL_TARGET_CMDS
 		$(INSTALL) -d $(TARGET_DIR)/usr/share/fonts/$$i && \
 		$(INSTALL) -m 0644 -t $(TARGET_DIR)/usr/share/fonts/$$i $(@D)/$$i/*.ttf; \
 	done
-endef
-
-define GOOGLEFONTDIRECTORY_UNINSTALL_TARGET_CMDS
-	rm -rf $(addprefix $(TARGET_DIR)/usr/share/fonts/,$(GOOGLEFONTDIRECTORY_FONTS))
 endef
 
 $(eval $(generic-package))

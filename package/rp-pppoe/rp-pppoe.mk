@@ -1,8 +1,8 @@
-#############################################################
+################################################################################
 #
 # rp-pppoe
 #
-#############################################################
+################################################################################
 
 RP_PPPOE_VERSION = 3.11
 RP_PPPOE_SITE = http://www.roaringpenguin.com/files/download
@@ -23,15 +23,6 @@ define RP_PPPOE_INSTALL_TARGET_CMDS
 	done
 	for ff in $(RP_PPPOE_TARGET_FILES); do \
 		$(INSTALL) -m 644 -D $(RP_PPPOE_DIR)/man/$$ff.8 $(TARGET_DIR)/usr/share/man/man8/$$ff.8; \
-	done
-endef
-
-define RP_PPPOE_UNINSTALL_TARGET_CMDS
-	for ff in $(RP_PPPOE_TARGET_FILES); do \
-		rm -f $(TARGET_DIR)/usr/sbin/$$ff; \
-	done
-	for ff in $(RP_PPPOE_TARGET_FILES); do \
-		rm -f $(TARGET_DIR)/usr/share/man/man8/$$ff.8; \
 	done
 endef
 

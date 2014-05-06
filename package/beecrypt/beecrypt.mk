@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
 # beecrypt
 #
-#############################################################
+################################################################################
+
 BEECRYPT_VERSION = 4.2.1
 BEECRYPT_SITE = http://downloads.sourceforge.net/project/beecrypt/beecrypt/$(BEECRYPT_VERSION)
 BEECRYPT_AUTORECONF = YES
@@ -18,10 +19,10 @@ BEECRYPT_CONF_ENV = \
 
 BEECRYPT_CONF_OPT = \
 		--without-java \
-		--without-python
+		--without-python \
+		--disable-openmp
 
-ifeq ($(BR2_PACKAGE_ICU),y)
-# C++ support needs icu
+ifeq ($(BR2_PACKAGE_BEECRYPT_CPP),y)
 BEECRYPT_DEPENDENCIES += icu
 else
 BEECRYPT_CONF_OPT += --without-cplusplus

@@ -1,12 +1,12 @@
-#############################################################
+################################################################################
 #
 # mpfr
 #
-#############################################################
+################################################################################
 
-MPFR_VERSION = 3.1.1
+MPFR_VERSION = 3.1.2
 MPFR_SITE = http://www.mpfr.org/mpfr-$(MPFR_VERSION)
-MPFR_SOURCE = mpfr-$(MPFR_VERSION).tar.bz2
+MPFR_SOURCE = mpfr-$(MPFR_VERSION).tar.xz
 MPFR_LICENSE = LGPLv3+
 MPFR_LICENSE_FILES = COPYING.LESSER
 MPFR_INSTALL_STAGING = YES

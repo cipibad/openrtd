@@ -1,12 +1,13 @@
-#############################################################
+################################################################################
 #
 # cramfs
 #
-#############################################################
+################################################################################
 
-CRAMFS_VERSION=1.1
-CRAMFS_SOURCE=cramfs-$(CRAMFS_VERSION).tar.gz
-CRAMFS_SITE=http://downloads.sourceforge.net/project/cramfs/cramfs/$(CRAMFS_VERSION)
+CRAMFS_VERSION = 1.1
+CRAMFS_SITE = http://downloads.sourceforge.net/project/cramfs/cramfs/$(CRAMFS_VERSION)
+CRAMFS_LICENSE = GPLv2+
+CRAMFS_LICENSE_FILES = COPYING
 
 CRAMFS_DEPENDENCIES = zlib
 

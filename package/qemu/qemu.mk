@@ -1,10 +1,10 @@
-#############################################################
+################################################################################
 #
 # qemu
 #
-#############################################################
+################################################################################
 
-QEMU_VERSION = 1.2.2
+QEMU_VERSION = 1.6.0
 QEMU_SOURCE = qemu-$(QEMU_VERSION).tar.bz2
 QEMU_SITE = http://wiki.qemu.org/download
 QEMU_LICENSE = GPLv2 LGPLv2.1 MIT BSD-3c BSD-2c Others/BSD-1c
@@ -16,7 +16,7 @@ QEMU_LICENSE_FILES = COPYING COPYING.LIB
 #-------------------------------------------------------------
 # Host-qemu
 
-HOST_QEMU_DEPENDENCIES = host-pkgconf host-zlib host-libglib2
+HOST_QEMU_DEPENDENCIES = host-pkgconf host-zlib host-libglib2 host-pixman
 
 #       BR ARCH         qemu
 #       -------         ----
@@ -36,10 +36,7 @@ HOST_QEMU_DEPENDENCIES = host-pkgconf host-zlib host-libglib2
 #       mips64          ?
 #       mips64el        ?
 #       powerpc         ppc
-#       sh2             not supported
 #       sh2a            not supported
-#       sh3             not supported
-#       sh3eb           not supported
 #       sh4             sh4
 #       sh4eb           sh4eb
 #       sh4a            ?

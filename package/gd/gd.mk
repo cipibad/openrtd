@@ -4,15 +4,14 @@
 #
 ################################################################################
 
-GD_VERSION = 2.0.35
-GD_SOURCE = gd-$(GD_VERSION).tar.bz2
-GD_SITE = http://distfiles.gentoo.org/distfiles
-# needed because of configure.ac timestamp
-GD_AUTORECONF = YES
+GD_VERSION = 2.1.0
+GD_SOURCE = libgd-$(GD_VERSION).tar.xz
+GD_SITE = https://bitbucket.org/libgd/gd-libgd/downloads/
 GD_INSTALL_STAGING = YES
 GD_LICENSE = GD license
 GD_LICENSE_FILES = COPYING
 
+GD_CONFIG_SCRIPTS = gdlib-config
 GD_CONF_OPT = --without-x --disable-rpath
 
 ifeq ($(BR2_PACKAGE_FONTCONFIG),y)
@@ -22,7 +21,9 @@ endif
 
 ifeq ($(BR2_PACKAGE_FREETYPE),y)
 GD_DEPENDENCIES += freetype
-GD_CONF_ENV += ac_cv_path_FREETYPE_CONFIG=$(STAGING_DIR)/usr/bin/freetype-config
+GD_CONF_OPT += --with-freetype=$(STAGING_DIR)/usr
+else
+GD_CONF_OPT += --without-freetype
 endif
 
 ifeq ($(BR2_PACKAGE_JPEG),y)
@@ -32,7 +33,9 @@ endif
 
 ifeq ($(BR2_PACKAGE_LIBPNG),y)
 GD_DEPENDENCIES += libpng
-GD_CONF_OPT += --with-png
+GD_CONF_OPT += --with-png=$(STAGING_DIR)/usr
+else
+GD_CONF_OPT += --without-png
 endif
 
 ifeq ($(BR2_PACKAGE_XLIB_LIBXPM),y)
@@ -44,31 +47,6 @@ ifeq ($(BR2_PACKAGE_ZLIB),y)
 GD_DEPENDENCIES += zlib
 endif
 
-ifeq ($(BR2_PACKAGE_GETTEXT),y)
-GD_DEPENDENCIES += gettext
-else
-# configure.ac has newer timestamp than aclocal.m4 / configure, so we need
-# to autoreconf to regenerate them (or set configure.ac timestamp to older
-# than them) to make the Makefile happy.
-# configure.ac refers to AM_ICONV which we only have if gettext is enabled,
-# so add a dummy definition elsewise
-define GD_FIXUP_ICONV
-	echo 'm4_ifndef([AM_ICONV],[m4_define([AM_ICONV],[:])])' \
-		>> $(@D)/acinclude.m4
-endef
-
-GD_PRE_CONFIGURE_HOOKS += GD_FIXUP_ICONV
-endif
-
-define GD_FIXUP_GDLIB_CONFIG
-	$(SED) 's%prefix=/usr%prefix=$(STAGING_DIR)/usr%' \
-	    -e 's%exec_prefix=/usr%exec_prefix=$(STAGING_DIR)/usr%' \
-		$(STAGING_DIR)/usr/bin/gdlib-config
-endef
-
-GD_POST_INSTALL_STAGING_HOOKS += GD_FIXUP_GDLIB_CONFIG
-
-GD_TOOLS_                         	+= gdlib-config
 GD_TOOLS_$(BR2_PACKAGE_GD_ANNOTATE)	+= annotate
 GD_TOOLS_$(BR2_PACKAGE_GD_BDFTOGD)	+= bdftogd
 GD_TOOLS_$(BR2_PACKAGE_GD_GD2COPYPAL)	+= gd2copypal

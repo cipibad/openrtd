@@ -1,9 +1,9 @@
-#############################################################
+################################################################################
 #
 # Build a kernel with an integrated initial ramdisk
 # filesystem based on cpio.
 #
-#############################################################
+################################################################################
 
 ROOTFS_INITRAMFS_DEPENDENCIES += rootfs-cpio
 
@@ -18,6 +18,5 @@ rootfs-initramfs-show-depends:
 	@echo $(ROOTFS_INITRAMFS_DEPENDENCIES)
 
 ifeq ($(BR2_TARGET_ROOTFS_INITRAMFS),y)
-TARGETS += rootfs-initramfs
+TARGETS_ROOTFS += rootfs-initramfs
 endif
-

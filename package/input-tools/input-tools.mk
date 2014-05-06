@@ -1,8 +1,9 @@
-#############################################################
+################################################################################
 #
 # input-tools
 #
-#############################################################
+################################################################################
+
 INPUT_TOOLS_VERSION = 20051019
 INPUT_TOOLS_SOURCE  = joystick_$(INPUT_TOOLS_VERSION).orig.tar.gz
 INPUT_TOOLS_PATCH   = joystick_$(INPUT_TOOLS_VERSION)-5.diff.gz
@@ -36,14 +37,6 @@ define INPUT_TOOLS_INSTALL_TARGET_CMDS
 	for i in $(INPUT_TOOLS_TARGETS_y); do \
 		install -m 755 -D $(@D)/$$i $(TARGET_DIR)/usr/bin/$$i; \
 	done
-endef
-
-define INPUT_TOOLS_UNINSTALL_TARGET_CMDS
-	rm -f $(addprefix $(TARGET_DIR)/usr/bin/,$(INPUT_TOOLS_TARGETS_y))
-endef
-
-define INPUT_TOOLS_CLEAN_CMDS
-	rm -f $(addprefix $(@D)/,$(INPUT_TOOLS_TARGETS_y))
 endef
 
 $(eval $(generic-package))

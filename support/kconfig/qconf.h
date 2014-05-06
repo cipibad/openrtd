@@ -32,6 +32,7 @@ class ConfigMainWindow;
 
 class ConfigSettings : public QSettings {
 public:
+	ConfigSettings();
 	Q3ValueList<int> readSizes(const QString& key, bool *ok);
 	bool writeSizes(const QString& key, const Q3ValueList<int>& value);
 };
@@ -311,7 +312,7 @@ public slots:
 	void listFocusChanged(void);
 	void goBack(void);
 	void loadConfig(void);
-	void saveConfig(void);
+	bool saveConfig(void);
 	void saveConfigAs(void);
 	void searchConfig(void);
 	void showSingleView(void);
