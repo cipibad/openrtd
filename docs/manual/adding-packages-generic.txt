@@ -228,7 +228,7 @@ information is (assuming the package name is +libfoo+) :
   types for retrieving package tarballs. Git, Subversion, Mercurial,
   and Bazaar are supported URL types for retrieving packages directly
   from source code management systems. There is a helper function to make
-  it easier to download source tarballs from github (refer to
+  it easier to download source tarballs from GitHub (refer to
   xref:github-download-url[] for details). A filesystem path may be used
   to specify either a tarball or a directory containing the package
   source code. See +LIBFOO_SITE_METHOD+ below for more details on how
@@ -303,6 +303,9 @@ information is (assuming the package name is +libfoo+) :
   installed before the configuration of the current package starts. In
   a similar way, +HOST_LIBFOO_DEPENDENCIES+ lists the dependencies for
   the current host package.
+
+* +LIBFOO_PROVIDES+ lists all the virtual packages +libfoo+ is an
+  implementation of. See xref:virtual-package-tutorial[].
 
 * +LIBFOO_INSTALL_STAGING+ can be set to +YES+ or +NO+ (default). If
   set to +YES+, then the commands in the +LIBFOO_INSTALL_STAGING_CMDS+
@@ -409,6 +412,15 @@ different steps of the build process.
   the directory given by +$(STAGING_DIR)+. All development files
   should be installed, since they might be needed to compile other
   packages.
+
+* +LIBFOO_INSTALL_IMAGES_CMDS+ lists the actions to be performed to
+  install the package to the images directory, when the package is a
+  target package. The package must install its files to the directory
+  given by +$(BINARIES_DIR)+. Only files that are binary images (aka
+  images) that do not belong in the +TARGET_DIR+ but are necessary
+  for booting the board should be placed here. For example, a package
+  should utilize this step if it has binaries which would be similar
+  to the kernel image, bootloader or root filesystem images.
 
 * +LIBFOO_INSTALL_INIT_SYSV+ and +LIBFOO_INSTALL_INIT_SYSTEMD+ list the
   actions to install init scripts either for the systemV-like init systems

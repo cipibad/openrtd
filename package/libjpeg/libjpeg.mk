@@ -4,9 +4,11 @@
 #
 ################################################################################
 
-LIBJPEG_VERSION = 8d
+LIBJPEG_VERSION = 9a
 LIBJPEG_SITE = http://www.ijg.org/files/
 LIBJPEG_SOURCE = jpegsrc.v$(LIBJPEG_VERSION).tar.gz
+LIBJPEG_LICENSE = jpeg-license (BSD-3c-like)
+LIBJPEG_LICENSE_FILES = README
 LIBJPEG_INSTALL_STAGING = YES
 
 define LIBJPEG_REMOVE_USELESS_TOOLS

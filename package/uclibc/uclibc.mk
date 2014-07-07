@@ -6,6 +6,8 @@
 
 UCLIBC_VERSION = $(call qstrip,$(BR2_UCLIBC_VERSION_STRING))
 UCLIBC_SOURCE ?= uClibc-$(UCLIBC_VERSION).tar.bz2
+UCLIBC_LICENSE = LGPLv2.1+
+UCLIBC_LICENSE_FILES = COPYING.LIB
 
 ifeq ($(BR2_UCLIBC_VERSION_SNAPSHOT),y)
 UCLIBC_SITE = http://www.uclibc.org/downloads/snapshots
@@ -418,7 +420,7 @@ define UCLIBC_SETUP_DOT_CONFIG
 	$(call UCLIBC_OPT_SET,CROSS_COMPILER_PREFIX,"$(TARGET_CROSS)",$(@D))
 	$(call UCLIBC_OPT_SET,TARGET_$(UCLIBC_TARGET_ARCH),y,$(@D))
 	$(call UCLIBC_OPT_SET,TARGET_ARCH,"$(UCLIBC_TARGET_ARCH)",$(@D))
-	$(call UCLIBC_OPT_SET,KERNEL_HEADERS,"$(STAGING_DIR)/usr/include",$(@D))
+	$(call UCLIBC_OPT_SET,KERNEL_HEADERS,"$(LINUX_HEADERS_DIR)/usr/include",$(@D))
 	$(call UCLIBC_OPT_SET,RUNTIME_PREFIX,"/",$(@D))
 	$(call UCLIBC_OPT_SET,DEVEL_PREFIX,"/usr",$(@D))
 	$(call UCLIBC_OPT_SET,SHARED_LIB_LOADER_PREFIX,"/lib",$(@D))
@@ -479,14 +481,26 @@ define UCLIBC_BUILD_TEST_SUITE
 endef
 endif
 
+# In uClibc 0.9.31 parallel building is broken so we have to disable it
+# Fortunately uClibc 0.9.31 is only used by AVR32 and in its turn AVR32 is
+# about to be removed from buildroot.
+#
+# So as soon as AVR32 is removed please revert this patch so instead of
+# UCLIBC_MAKE normal "MAKE" is used in UCLIBC_BUILD_CMDS
+ifeq ($(BR2_UCLIBC_VERSION_0_9_31),y)
+	UCLIBC_MAKE = $(MAKE1)
+else
+	UCLIBC_MAKE = $(MAKE)
+endif
+
 define UCLIBC_BUILD_CMDS
-	$(MAKE1) -C $(@D) \
+	$(UCLIBC_MAKE) -C $(@D) \
 		$(UCLIBC_MAKE_FLAGS) \
 		PREFIX= \
 		DEVEL_PREFIX=/ \
 		RUNTIME_PREFIX=/ \
 		all
-	$(MAKE1) -C $(@D)/utils \
+	$(MAKE) -C $(@D)/utils \
 		PREFIX=$(HOST_DIR) \
 		HOSTCC="$(HOSTCC)" hostutils
 	$(UCLIBC_BUILD_TEST_SUITE)

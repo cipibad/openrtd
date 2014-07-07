@@ -14,7 +14,7 @@ RSYSLOG_AUTORECONF = YES
 RSYSLOG_CONF_OPT = --disable-testbench \
 		   --enable-cached-man-pages
 
-# Build after Busybox
+# Build after BusyBox
 ifeq ($(BR2_PACKAGE_BUSYBOX),y)
 	RSYSLOG_DEPENDENCIES += busybox
 endif
@@ -24,6 +24,7 @@ ifeq ($(BR2_PACKAGE_LIBEE),y)
 endif
 
 ifeq ($(BR2_PACKAGE_LIBGCRYPT),y)
+	RSYSLOG_DEPENDENCIES += libgcrypt
 	RSYSLOG_CONF_ENV += LIBGCRYPT_CONFIG=$(STAGING_DIR)/usr/bin/libgcrypt-config
 	RSYSLOG_CONF_OPT += --enable-libgcrypt=yes
 else

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SYSTEMD_VERSION = 212
+SYSTEMD_VERSION = 213
 SYSTEMD_SITE = http://www.freedesktop.org/software/systemd/
 SYSTEMD_SOURCE = systemd-$(SYSTEMD_VERSION).tar.xz
 SYSTEMD_LICENSE = LGPLv2.1+; GPLv2+ for udev; MIT-like license for few source files listed in README
@@ -16,6 +16,9 @@ SYSTEMD_DEPENDENCIES = \
 	util-linux \
 	kmod \
 	host-gperf
+
+SYSTEMD_PROVIDES = udev
+SYSTEMD_AUTORECONF = YES
 
 # Make sure that systemd will always be built after busybox so that we have
 # a consistent init setup between two builds
@@ -32,6 +35,7 @@ SYSTEMD_CONF_OPT += \
 	--disable-selinux \
 	--disable-pam \
 	--disable-libcryptsetup \
+	--disable-gtk-doc \
 	--with-dbuspolicydir=/etc/dbus-1/system.d \
 	--with-dbussessionservicedir=/usr/share/dbus-1/services \
 	--with-dbussystemservicedir=/usr/share/dbus-1/system-services \
@@ -57,6 +61,13 @@ SYSTEMD_CONF_OPT += --enable-acl
 SYSTEMD_DEPENDENCIES += acl
 else
 SYSTEMD_CONF_OPT += --disable-acl
+endif
+
+ifeq ($(BR2_PACKAGE_ATTR),y)
+SYSTEMD_CONF_OPT += --enable-attr
+SYSTEMD_DEPENDENCIES += attr
+else
+SYSTEMD_CONF_OPT += --disable-attr
 endif
 
 ifeq ($(BR2_PACKAGE_LIBGLIB2),y)
@@ -90,6 +101,28 @@ ifeq ($(BR2_PACKAGE_SYSTEMD_NETWORKD),y)
 SYSTEMD_CONF_OPT += --enable-networkd
 else
 SYSTEMD_CONF_OPT += --disable-networkd
+define SYSTEMD_INSTALL_SERVICE_NETWORK
+	$(INSTALL) -D -m 644 package/systemd/network.service \
+		$(TARGET_DIR)/etc/systemd/system/network.service
+	mkdir -p $(TARGET_DIR)/etc/systemd/system/multi-user.target.wants
+	ln -fs ../network.service \
+		$(TARGET_DIR)/etc/systemd/system/multi-user.target.wants/network.service
+endef
+endif
+
+ifeq ($(BR2_PACKAGE_SYSTEMD_TIMESYNCD),y)
+SYSTEMD_CONF_OPT += --enable-timesyncd
+define SYSTEMD_USER_TIMESYNC
+	systemd-timesync -1 systemd-timesync -1 * - - - Network Time Synchronization
+endef
+else
+SYSTEMD_CONF_OPT += --disable-timesyncd
+endif
+
+ifeq ($(BR2_PACKAGE_SYSTEMD_SMACK_SUPPORT),y)
+SYSTEMD_CONF_OPT += --enable-smack
+else
+SYSTEMD_CONF_OPT += --disable-smack
 endif
 
 # mq_getattr needs -lrt
@@ -105,11 +138,6 @@ define SYSTEMD_INSTALL_INIT_HOOK
 	ln -fs ../../../lib/systemd/system/multi-user.target $(TARGET_DIR)/etc/systemd/system/default.target
 endef
 
-define SYSTEMD_INSTALL_TTY_HOOK
-	rm -f $(TARGET_DIR)/etc/systemd/system/getty.target.wants/getty@tty1.service
-	ln -fs ../../../../lib/systemd/system/serial-getty@.service $(TARGET_DIR)/etc/systemd/system/getty.target.wants/serial-getty@$(BR2_TARGET_GENERIC_GETTY_PORT).service
-endef
-
 define SYSTEMD_INSTALL_MACHINEID_HOOK
 	touch $(TARGET_DIR)/etc/machine-id
 endef
@@ -121,13 +149,23 @@ endef
 
 SYSTEMD_POST_INSTALL_TARGET_HOOKS += \
 	SYSTEMD_INSTALL_INIT_HOOK \
-	SYSTEMD_INSTALL_TTY_HOOK \
 	SYSTEMD_INSTALL_MACHINEID_HOOK \
 	SYSTEMD_SANITIZE_PATH_IN_UNITS
 
 define SYSTEMD_USERS
 	systemd-journal -1 systemd-journal -1 * /var/log/journal - - Journal
 	systemd-journal-gateway -1 systemd-journal-gateway -1 * /var/log/journal - - Journal Gateway
+	$(SYSTEMD_USER_TIMESYNC)
+endef
+
+define SYSTEMD_INSTALL_SERVICE_TTY
+	rm -f $(TARGET_DIR)/etc/systemd/system/getty.target.wants/getty@tty1.service
+	ln -fs ../../../../lib/systemd/system/serial-getty@.service $(TARGET_DIR)/etc/systemd/system/getty.target.wants/serial-getty@$(BR2_TARGET_GENERIC_GETTY_PORT).service
+endef
+
+define SYSTEMD_INSTALL_INIT_SYSTEMD
+	$(SYSTEMD_INSTALL_SERVICE_TTY)
+	$(SYSTEMD_INSTALL_SERVICE_NETWORK)
 endef
 
 $(eval $(autotools-package))

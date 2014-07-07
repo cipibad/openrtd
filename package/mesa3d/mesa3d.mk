@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-MESA3D_VERSION = 10.0.4
+MESA3D_VERSION = 10.2.1
 MESA3D_SOURCE = MesaLib-$(MESA3D_VERSION).tar.bz2
 MESA3D_SITE = ftp://ftp.freedesktop.org/pub/mesa/$(MESA3D_VERSION)
 MESA3D_LICENSE = MIT, SGI, Khronos
@@ -12,6 +12,8 @@ MESA3D_LICENSE_FILES = docs/license.html
 MESA3D_AUTORECONF = YES
 
 MESA3D_INSTALL_STAGING = YES
+
+MESA3D_PROVIDES =
 
 MESA3D_DEPENDENCIES = \
 	expat \
@@ -33,9 +35,13 @@ MESA3D_DEPENDENCIES += \
 	xlib_libXdamage \
 	xlib_libXfixes \
 	libxcb
-MESA3D_CONF_OPT += \
-	--enable-glx \
-	--enable-xa
+MESA3D_CONF_OPT += --enable-glx
+# quote from mesa3d configure "Building xa requires at least one non swrast gallium driver."
+ifneq ($(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_NOUVEAU)$(BR2_PACKAGE_MESA3D_GALLIUM_DRIVER_SVGA),)
+MESA3D_CONF_OPT += --enable-xa
+else
+MESA3D_CONF_OPT += --disable-xa
+endif
 else
 MESA3D_CONF_OPT += \
 	--disable-glx \
@@ -63,15 +69,15 @@ MESA3D_CONF_OPT += \
 	--without-gallium-drivers
 else
 MESA3D_CONF_OPT += \
+	--enable-shared-glapi \
 	--with-gallium-drivers=$(subst $(space),$(comma),$(MESA3D_GALLIUM_DRIVERS-y))
 endif
 
 ifeq ($(MESA3D_DRI_DRIVERS-y),)
 MESA3D_CONF_OPT += \
-	--disable-dri \
-	--disable-shared-glapi \
 	--without-dri-drivers
 else
+MESA3D_PROVIDES += libgl
 MESA3D_CONF_OPT += \
 	--enable-dri \
 	--enable-shared-glapi \
@@ -86,6 +92,7 @@ endif
 MESA3D_CONF_OPT += --enable-opengl
 
 ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_EGL),y)
+MESA3D_PROVIDES += libegl
 # egl depends on gbm, gbm depends on udev
 MESA3D_DEPENDENCIES += udev
 MESA3D_EGL_PLATFORMS = drm
@@ -102,11 +109,11 @@ MESA3D_CONF_OPT += \
 	--with-egl-platforms=$(subst $(space),$(comma),$(MESA3D_EGL_PLATFORMS))
 else
 MESA3D_CONF_OPT += \
-	--disable-gbm \
 	--disable-egl
 endif
 
 ifeq ($(BR2_PACKAGE_MESA3D_OPENGL_ES),y)
+MESA3D_PROVIDES += libgles
 MESA3D_CONF_OPT += --enable-gles1 --enable-gles2
 else
 MESA3D_CONF_OPT += --disable-gles1 --disable-gles2

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-SAMBA4_VERSION = 4.1.7
+SAMBA4_VERSION = 4.1.9
 SAMBA4_SITE = http://ftp.samba.org/pub/samba/stable
 SAMBA4_SOURCE = samba-$(SAMBA4_VERSION).tar.gz
 SAMBA4_LICENSE = GPLv3+
@@ -88,6 +88,7 @@ define SAMBA4_CONFIGURE_CMDS
 			--without-ldap \
 			--without-cluster-support \
 			--without-ads \
+			--bundled-libraries='!asn1_compile,!compile_et' \
 			$(SAMBA4_CONF_OPT) \
 	)
 endef

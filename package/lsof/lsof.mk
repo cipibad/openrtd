@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-LSOF_VERSION = 4.85
+LSOF_VERSION = 4.87
 LSOF_SOURCE = lsof_$(LSOF_VERSION).tar.bz2
 LSOF_SITE = ftp://lsof.itap.purdue.edu/pub/tools/unix/lsof/
 LSOF_LICENSE = lsof license
@@ -27,8 +27,6 @@ ifeq ($(BR2_USE_WCHAR),)
 define LSOF_CONFIGURE_WCHAR_FIXUPS
 	$(SED) 's,^#define[[:space:]]*HASWIDECHAR.*,#undef HASWIDECHAR,' \
 		$(@D)/machine.h
-	$(SED) 's,^#define[[:space:]]*WIDECHARINCL.*,,' \
-		$(@D)/machine.h
 endef
 endif
 
@@ -49,7 +47,8 @@ endef
 define LSOF_CONFIGURE_CMDS
 	(cd $(@D) ; \
 		echo n | $(TARGET_CONFIGURE_OPTS) DEBUG="$(TARGET_CFLAGS) $(BR2_LSOF_CFLAGS)" \
-		LSOF_INCLUDE="$(STAGING_DIR)/usr/include" LSOF_CFLAGS_OVERRIDE=1 ./Configure linux)
+		LSOF_INCLUDE="$(STAGING_DIR)/usr/include" LSOF_CFLAGS_OVERRIDE=1 \
+		LINUX_CLIB=-DGLIBCV=2 ./Configure linux)
 	$(LSOF_CONFIGURE_WCHAR_FIXUPS)
 	$(LSOF_CONFIGURE_LOCALE_FIXUPS)
 endef
@@ -59,7 +58,7 @@ define LSOF_BUILD_CMDS
 endef
 
 define LSOF_INSTALL_TARGET_CMDS
-	install -D -m 755 $(@D)/lsof $(TARGET_DIR)/bin/lsof
+	$(INSTALL) -D -m 755 $(@D)/lsof $(TARGET_DIR)/usr/bin/lsof
 endef
 
 $(eval $(generic-package))

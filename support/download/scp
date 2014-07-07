@@ -1,0 +1,28 @@
+#!/bin/bash
+
+# We want to catch any command failure, and exit immediately
+set -e
+
+# Download helper for scp
+# Call it with:
+#   $1: URL
+#   $2: output file
+# And this environment:
+#   SCP       : the scp command to call
+
+url="${1}"
+output="${2}"
+tmp_dl="$( mktemp "${BUILD_DIR}/.XXXXXX" )"
+tmp_output="$( mktemp "${output}.XXXXXX" )"
+
+ret=1
+if ${SCP} "${url}" "${tmp_dl}"; then
+    if mv "${tmp_dl}" "${tmp_output}"; then
+        mv "${tmp_output}" "${output}"
+        ret=0
+    fi
+fi
+
+# Cleanup
+rm -f "${tmp_dl}" "${tmp_output}"
+exit ${ret}

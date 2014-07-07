@@ -8,15 +8,15 @@
 ################################################################################
 
 # Download method commands
-WGET := $(call qstrip,$(BR2_WGET)) $(QUIET)
-SVN := $(call qstrip,$(BR2_SVN))
-CVS := $(call qstrip,$(BR2_CVS))
-BZR := $(call qstrip,$(BR2_BZR))
-GIT := $(call qstrip,$(BR2_GIT))
-HG := $(call qstrip,$(BR2_HG)) $(QUIET)
-SCP := $(call qstrip,$(BR2_SCP)) $(QUIET)
+export WGET := $(call qstrip,$(BR2_WGET)) $(QUIET)
+export SVN := $(call qstrip,$(BR2_SVN))
+export CVS := $(call qstrip,$(BR2_CVS))
+export BZR := $(call qstrip,$(BR2_BZR))
+export GIT := $(call qstrip,$(BR2_GIT))
+export HG := $(call qstrip,$(BR2_HG)) $(QUIET)
+export SCP := $(call qstrip,$(BR2_SCP)) $(QUIET)
 SSH := $(call qstrip,$(BR2_SSH)) $(QUIET)
-LOCALFILES := $(call qstrip,$(BR2_LOCALFILES))
+export LOCALFILES := $(call qstrip,$(BR2_LOCALFILES))
 
 # Default spider mode is 'DOWNLOAD'. Other possible values are 'SOURCE_CHECK'
 # used by the _source-check target and 'SHOW_EXTERNAL_DEPS', used by the
@@ -55,8 +55,19 @@ notdomain=$(patsubst $(call domain,$(1),$(2))$(call domainseparator,$(2))%,%,$(c
 # default domainseparator is /, specify alternative value as first argument
 domainseparator=$(if $(1),$(1),/)
 
-# github(user,package,version): returns site of github repository
+# github(user,package,version): returns site of GitHub repository
 github = https://github.com/$(1)/$(2)/archive/$(3)
+
+# Helper for checking a tarball's checksum
+# If the hash does not match, remove the incorrect file
+# $(1): the path to the file with the hashes
+# $(2): the full path to the file to check
+define VERIFY_HASH
+	if ! support/download/check-hash $(1) $(2); then \
+		rm -f $(2); \
+		exit 1; \
+	fi
+endef
 
 ################################################################################
 # The DOWNLOAD_* helpers are in charge of getting a working copy
@@ -84,19 +95,8 @@ github = https://github.com/$(1)/$(2)/archive/$(3)
 # problems
 define DOWNLOAD_GIT
 	test -e $(DL_DIR)/$($(PKG)_SOURCE) || \
-	(pushd $(DL_DIR) > /dev/null && \
-	 ((test "`git ls-remote $($(PKG)_SITE) $($(PKG)_DL_VERSION)`" && \
-	   echo "Doing shallow clone" && \
-	   $(GIT) clone --depth 1 -b $($(PKG)_DL_VERSION) --bare $($(PKG)_SITE) $($(PKG)_BASE_NAME)) || \
-	  (echo "Doing full clone" && \
-	   $(GIT) clone --bare $($(PKG)_SITE) $($(PKG)_BASE_NAME))) && \
-	pushd $($(PKG)_BASE_NAME) > /dev/null && \
-	$(GIT) archive --format=tar --prefix=$($(PKG)_BASE_NAME)/ -o $(DL_DIR)/.$($(PKG)_SOURCE).tmp $($(PKG)_DL_VERSION) && \
-	gzip -c $(DL_DIR)/.$($(PKG)_SOURCE).tmp > $(DL_DIR)/$($(PKG)_SOURCE) && \
-	rm -f $(DL_DIR)/.$($(PKG)_SOURCE).tmp && \
-	popd > /dev/null && \
-	rm -rf $($(PKG)_DL_DIR) && \
-	popd > /dev/null)
+	$(EXTRA_ENV) support/download/git $($(PKG)_SITE) $($(PKG)_DL_VERSION) \
+					  $($(PKG)_BASE_NAME) $(DL_DIR)/$($(PKG)_SOURCE)
 endef
 
 # TODO: improve to check that the given PKG_DL_VERSION exists on the remote
@@ -112,7 +112,7 @@ endef
 
 define DOWNLOAD_BZR
 	test -e $(DL_DIR)/$($(PKG)_SOURCE) || \
-	$(BZR) export $(DL_DIR)/$($(PKG)_SOURCE) $($(PKG)_SITE) -r $($(PKG)_DL_VERSION)
+	$(EXTRA_ENV) support/download/bzr $($(PKG)_SITE) $($(PKG)_DL_VERSION) $(DL_DIR)/$($(PKG)_SOURCE)
 endef
 
 define SOURCE_CHECK_BZR
@@ -125,12 +125,9 @@ endef
 
 define DOWNLOAD_CVS
 	test -e $(DL_DIR)/$($(PKG)_SOURCE) || \
-	(pushd $(DL_DIR) > /dev/null && \
-	$(CVS) -z3 -d:pserver:anonymous@$(call stripurischeme,$(call qstrip,$($(PKG)_SITE))) \
-		co -d $($(PKG)_BASE_NAME) -r :$($(PKG)_DL_VERSION) -P $($(PKG)_RAWNAME) && \
-	$(TAR) czf $($(PKG)_SOURCE) $($(PKG)_BASE_NAME)/ && \
-	rm -rf $($(PKG)_DL_DIR) && \
-	popd > /dev/null)
+	$(EXTRA_ENV) support/download/cvs $(call stripurischeme,$(call qstrip,$($(PKG)_SITE))) \
+					  $($(PKG)_DL_VERSION) $($(PKG)_RAWNAME) \
+					  $($(PKG)_BASE_NAME) $(DL_DIR)/$($(PKG)_SOURCE)
 endef
 
 # Not all CVS servers support ls/rls, use login to see if we can connect
@@ -144,15 +141,12 @@ endef
 
 define DOWNLOAD_SVN
 	test -e $(DL_DIR)/$($(PKG)_SOURCE) || \
-	(pushd $(DL_DIR) > /dev/null && \
-	$(SVN) export -r $($(PKG)_DL_VERSION) $($(PKG)_SITE) $($(PKG)_DL_DIR) && \
-	$(TAR) czf $($(PKG)_SOURCE) $($(PKG)_BASE_NAME)/ && \
-	rm -rf $($(PKG)_DL_DIR) && \
-	popd > /dev/null)
+	$(EXTRA_ENV) support/download/svn $($(PKG)_SITE) $($(PKG)_DL_VERSION) \
+					  $($(PKG)_BASE_NAME) $(DL_DIR)/$($(PKG)_SOURCE)
 endef
 
 define SOURCE_CHECK_SVN
-  $(SVN) ls $($(PKG)_SITE) > /dev/null
+  $(SVN) ls $($(PKG)_SITE)@$($(PKG)_DL_VERSION) > /dev/null
 endef
 
 define SHOW_EXTERNAL_DEPS_SVN
@@ -164,7 +158,9 @@ endef
 # to prepend the path with a slash: scp://[user@]host:/absolutepath
 define DOWNLOAD_SCP
 	test -e $(DL_DIR)/$(2) || \
-	$(SCP) '$(call stripurischeme,$(call qstrip,$(1)))' $(DL_DIR)/$(2)
+	$(EXTRA_ENV) support/download/scp '$(call stripurischeme,$(call qstrip,$(1)))' \
+					  $(DL_DIR)/$(2) && \
+	$(call VERIFY_HASH,$(PKGDIR)/$($(PKG)_NAME).hash,$(DL_DIR)/$(2))
 endef
 
 define SOURCE_CHECK_SCP
@@ -178,13 +174,8 @@ endef
 
 define DOWNLOAD_HG
 	test -e $(DL_DIR)/$($(PKG)_SOURCE) || \
-	(pushd $(DL_DIR) > /dev/null && \
-	rm -rf $($(PKG)_BASE_NAME) && \
-	$(HG) clone --noupdate --rev $($(PKG)_DL_VERSION) $($(PKG)_SITE) $($(PKG)_BASE_NAME) && \
-	$(HG) archive --repository $($(PKG)_BASE_NAME) --type tgz --prefix $($(PKG)_BASE_NAME)/ \
-	              --rev $($(PKG)_DL_VERSION) $(DL_DIR)/$($(PKG)_SOURCE) && \
-	rm -rf $($(PKG)_DL_DIR) && \
-	popd > /dev/null)
+	$(EXTRA_ENV) support/download/hg $($(PKG)_SITE) $($(PKG)_DL_VERSION) \
+					  $($(PKG)_BASE_NAME) $(DL_DIR)/$($(PKG)_SOURCE)
 endef
 
 # TODO: improve to check that the given PKG_DL_VERSION exists on the remote
@@ -197,17 +188,11 @@ define SHOW_EXTERNAL_DEPS_HG
   echo $($(PKG)_SOURCE)
 endef
 
-# Download a file using wget. Only download the file if it doesn't
-# already exist in the download directory. If the download fails,
-# remove the file (because wget -O creates a 0-byte file even if the
-# download fails).  To handle an interrupted download as well, download
-# to a temporary file first.  The temporary file will be overwritten
-# the next time the download is tried.
+
 define DOWNLOAD_WGET
 	test -e $(DL_DIR)/$(2) || \
-	($(WGET) -O $(DL_DIR)/$(2).tmp '$(call qstrip,$(1))' && \
-	 mv $(DL_DIR)/$(2).tmp $(DL_DIR)/$(2)) || \
-	(rm -f $(DL_DIR)/$(2).tmp ; exit 1)
+	$(EXTRA_ENV) support/download/wget '$(call qstrip,$(1))' $(DL_DIR)/$(2) && \
+	$(call VERIFY_HASH,$(PKGDIR)/$($(PKG)_NAME).hash,$(DL_DIR)/$(2))
 endef
 
 define SOURCE_CHECK_WGET
@@ -220,7 +205,9 @@ endef
 
 define DOWNLOAD_LOCALFILES
 	test -e $(DL_DIR)/$(2) || \
-		$(LOCALFILES) $(call stripurischeme,$(call qstrip,$(1))) $(DL_DIR)
+	$(EXTRA_ENV) support/download/cp $(call stripurischeme,$(call qstrip,$(1))) \
+					 $(DL_DIR) && \
+	$(call VERIFY_HASH,$(PKGDIR)/$($(PKG)_NAME).hash,$(DL_DIR)/$(2))
 endef
 
 define SOURCE_CHECK_LOCALFILES

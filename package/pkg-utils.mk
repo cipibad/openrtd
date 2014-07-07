@@ -29,7 +29,7 @@ $(eval $(call caseconvert-helper,LOWERCASE,$(join $(addsuffix :,$([TO])),$([FROM
 
 #
 # Manipulation of .config files based on the Kconfig
-# infrastructure. Used by the Busybox package, the Linux kernel
+# infrastructure. Used by the BusyBox package, the Linux kernel
 # package, and more.
 #
 
@@ -101,8 +101,8 @@ define legal-warning-pkg # pkg, text
 	echo "WARNING: $(1): $(2)" >>$(LEGAL_WARNINGS)
 endef
 
-define legal-warning-pkg-savednothing # pkg, {local|override}
-	$(call legal-warning-pkg,$(1),sources and license files not saved ($(2) packages not handled))
+define legal-warning-nosource # pkg, {local|override}
+	$(call legal-warning-pkg,$(1),sources not saved ($(2) packages not handled))
 endef
 
 define legal-manifest # pkg, version, license, license-files, source, {HOST|TARGET}
@@ -110,8 +110,8 @@ define legal-manifest # pkg, version, license, license-files, source, {HOST|TARG
 endef
 
 define legal-license-header # pkg, license-file, {HOST|TARGET}
-	echo -e "$(LEGAL_INFO_SEPARATOR)\n\t$(1):" \
-		"$(2)\n$(LEGAL_INFO_SEPARATOR)\n\n" >>$(LEGAL_LICENSES_TXT_$(3))
+	printf "$(LEGAL_INFO_SEPARATOR)\n\t$(1):\
+		$(2)\n$(LEGAL_INFO_SEPARATOR)\n\n\n" >>$(LEGAL_LICENSES_TXT_$(3))
 endef
 
 define legal-license-nofiles # pkg, {HOST|TARGET}

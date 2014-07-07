@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-EUDEV_VERSION = 1.5.3
+EUDEV_VERSION = v1.7
 EUDEV_SITE = $(call github,gentoo,eudev,$(EUDEV_VERSION))
 EUDEV_LICENSE = GPLv2+ (programs), LGPLv2.1+ (libraries)
 EUDEV_LICENSE_FILES = COPYING
@@ -25,6 +25,7 @@ EUDEV_CONF_OPT =		\
 	--enable-libkmod
 
 EUDEV_DEPENDENCIES = host-gperf host-pkgconf util-linux kmod
+EUDEV_PROVIDES = udev
 
 ifeq ($(BR2_PACKAGE_EUDEV_RULES_GEN),y)
 EUDEV_CONF_OPT += --enable-rule_generator

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-DNSMASQ_VERSION = 2.70
+DNSMASQ_VERSION = 2.71
 DNSMASQ_SOURCE = dnsmasq-$(DNSMASQ_VERSION).tar.xz
 DNSMASQ_SITE = http://thekelleys.org.uk/dnsmasq
 DNSMASQ_MAKE_ENV = $(TARGET_MAKE_ENV) CC="$(TARGET_CC)"
@@ -55,7 +55,11 @@ endif
 
 ifeq ($(BR2_PACKAGE_DNSMASQ_LUA),y)
 	DNSMASQ_DEPENDENCIES += lua
-	DNSMASQ_MAKE_OPT += LDFLAGS+="-ldl"
+
+# liblua uses dlopen when dynamically linked
+ifneq ($(BR2_PREFER_STATIC_LIB),y)
+	DNSMASQ_MAKE_OPT += LIBS="-ldl"
+endif
 
 define DNSMASQ_ENABLE_LUA
 	$(SED) 's/lua5.1/lua/g' $(DNSMASQ_DIR)/Makefile

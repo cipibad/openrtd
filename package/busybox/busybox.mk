@@ -22,7 +22,7 @@ BUSYBOX_LDFLAGS = \
 	$(TARGET_LDFLAGS)
 
 # Link against libtirpc if available so that we can leverage its RPC
-# support for NFS mounting with Busybox
+# support for NFS mounting with BusyBox
 ifeq ($(BR2_PACKAGE_LIBTIRPC),y)
 BUSYBOX_DEPENDENCIES += libtirpc
 BUSYBOX_CFLAGS += -I$(STAGING_DIR)/usr/include/tirpc/
@@ -59,12 +59,12 @@ endef
 ifeq ($(BR2_ROOTFS_DEVICE_CREATION_DYNAMIC_MDEV),y)
 define BUSYBOX_INSTALL_MDEV_SCRIPT
 	[ -f $(TARGET_DIR)/etc/init.d/S10mdev ] || \
-		install -D -m 0755 package/busybox/S10mdev \
+		$(INSTALL) -D -m 0755 package/busybox/S10mdev \
 			$(TARGET_DIR)/etc/init.d/S10mdev
 endef
 define BUSYBOX_INSTALL_MDEV_CONF
 	[ -f $(TARGET_DIR)/etc/mdev.conf ] || \
-		install -D -m 0644 package/busybox/mdev.conf \
+		$(INSTALL) -D -m 0644 package/busybox/mdev.conf \
 			$(TARGET_DIR)/etc/mdev.conf
 endef
 define BUSYBOX_SET_MDEV
@@ -182,12 +182,18 @@ define BUSYBOX_SET_WATCHDOG
 endef
 define BUSYBOX_INSTALL_WATCHDOG_SCRIPT
 	[ -f $(TARGET_DIR)/etc/init.d/S15watchdog ] || \
-		install -D -m 0755 package/busybox/S15watchdog \
+		$(INSTALL) -D -m 0755 package/busybox/S15watchdog \
 			$(TARGET_DIR)/etc/init.d/S15watchdog && \
-		sed -i s/PERIOD/$(call qstrip,$(BR2_PACKAGE_BUSYBOX_WATCHDOG_PERIOD))/ \
+		$(SED) s/PERIOD/$(call qstrip,$(BR2_PACKAGE_BUSYBOX_WATCHDOG_PERIOD))/ \
 			$(TARGET_DIR)/etc/init.d/S15watchdog
 endef
 endif
+
+# Enable "noclobber" in install.sh, to prevent BusyBox from overwritting any
+# full-blown versions of apps installed by other packages with sym/hard links.
+define BUSYBOX_NOCLOBBER_INSTALL
+	$(SED) 's/^noclobber="0"$$/noclobber="1"/' $(@D)/applets/install.sh
+endef
 
 define BUSYBOX_CONFIGURE_CMDS
 	$(BUSYBOX_COPY_CONFIG)
@@ -204,6 +210,7 @@ define BUSYBOX_CONFIGURE_CMDS
 	$(BUSYBOX_SET_WATCHDOG)
 	@yes "" | $(MAKE) ARCH=$(KERNEL_ARCH) CROSS_COMPILE="$(TARGET_CROSS)" \
 		-C $(@D) oldconfig
+	$(BUSYBOX_NOCLOBBER_INSTALL)
 endef
 
 define BUSYBOX_BUILD_CMDS

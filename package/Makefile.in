@@ -305,6 +305,7 @@ HOST_MAKE_ENV=PATH=$(BR_PATH) \
 # post-images)
 EXTRA_ENV=\
 	PATH=$(BR_PATH) \
+	BR2_DL_DIR=$(BR2_DL_DIR) \
 	BUILD_DIR=$(BUILD_DIR)
 
 ################################################################################
@@ -321,7 +322,7 @@ endif
 ifeq ($(BR2_m68k),y)
 BR2_AC_CV_TRAP_CHECK=ac_cv_lbl_unaligned_fail=no
 endif
-ifeq ($(BR2_powerpc)$(BR2_ENDIAN),yBIG)
+ifeq ($(BR2_powerpc)$(BR2_powerpc64)$(BR2_powerpc64le),y)
 BR2_AC_CV_TRAP_CHECK=ac_cv_lbl_unaligned_fail=no
 endif
 

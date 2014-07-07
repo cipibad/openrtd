@@ -288,6 +288,7 @@ check_uclibc = \
 # configuration of the external toolchain.
 #
 # $1: cross-gcc path
+# $2: cross-readelf path
 #
 check_arm_abi = \
 	__CROSS_CC=$(strip $1) ; \
@@ -297,18 +298,10 @@ check_arm_abi = \
 		echo "External toolchain uses the unsuported OABI" ; \
 		exit 1 ; \
 	fi ; \
-	EXT_TOOLCHAIN_CRT1=`LANG=C $${__CROSS_CC} -print-file-name=crt1.o` ; \
-	if $${__CROSS_READELF} -A $${EXT_TOOLCHAIN_CRT1} | grep -q "Tag_ABI_VFP_args:" ; then \
-		EXT_TOOLCHAIN_ABI="eabihf" ; \
-	else \
-		EXT_TOOLCHAIN_ABI="eabi" ; \
-	fi ; \
-	if [ "$(BR2_ARM_EABI)" = "y" -a "$${EXT_TOOLCHAIN_ABI}" = "eabihf" ] ; then \
-		echo "Incorrect ABI setting: EABI selected, but toolchain uses EABIhf" ; \
-		exit 1 ; \
-	fi ; \
-	if [ "$(BR2_ARM_EABIHF)" = "y" -a "$${EXT_TOOLCHAIN_ABI}" = "eabi" ] ; then \
-		echo "Incorrect ABI setting: EABIhf selected, but toolchain uses EABI" ; \
+	if ! echo 'int main(void) {}' | $${__CROSS_CC} -x c -o /dev/null - ; then \
+		abistr_$(BR2_ARM_EABI)='EABI'; \
+		abistr_$(BR2_ARM_EABIHF)='EABIhf'; \
+		echo "Incorrect ABI setting: $${abistr_y} selected, but toolchain is incompatible"; \
 		exit 1 ; \
 	fi
 

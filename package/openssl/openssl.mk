@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-OPENSSL_VERSION = 1.0.1g
+OPENSSL_VERSION = 1.0.1h
 OPENSSL_SITE = http://www.openssl.org/source
 OPENSSL_LICENSE = OpenSSL or SSLeay
 OPENSSL_LICENSE_FILES = LICENSE
@@ -45,6 +45,12 @@ ifeq ($(ARCH),powerpc)
 ifeq ($(BR2_powerpc_401)$(BR2_powerpc_403)$(BR2_powerpc_405)$(BR2_powerpc_405fp)$(BR2_powerpc_440)$(BR2_powerpc_440fp),)
 	OPENSSL_TARGET_ARCH = ppc
 endif
+endif
+ifeq ($(ARCH),powerpc64)
+	OPENSSL_TARGET_ARCH = ppc64
+endif
+ifeq ($(ARCH),powerpc64le)
+	OPENSSL_TARGET_ARCH = ppc64le
 endif
 ifeq ($(ARCH),x86_64)
 	OPENSSL_TARGET_ARCH = x86_64

@@ -76,9 +76,9 @@ to +make+ or set in the environment:
   is the recommended way of setting it.
   +
 * +BUSYBOX_CONFIG_FILE=<path/to/.config>+, path to
-  the Busybox configuration file.
+  the BusyBox configuration file.
   +
-  Note that the Busybox configuration file can also be set from the
+  Note that the BusyBox configuration file can also be set from the
   configuration interface, so through the Buildroot +.config+ file; this
   is the recommended way of setting it.
   +
@@ -92,8 +92,10 @@ to +make+ or set in the environment:
   build-time graphs
 * +BR2_GRAPH_OUT+ to set the filetype of generated graphs, either +pdf+ (the
   default), or +png+.
-* +BR2_GRAPH_DEPTH+ (an integer) to limit the depth of the dependency graph.
-  The default, +0+, is to not limit the depth.
+* +BR2_GRAPH_DEPS_OPTS+ to pass extra options to the dependency graph; see
+  xref:graph-depends[] for the accepted options
+* +BR2_GRAPH_DOT_OPTS+ is passed verbatim as options to the +dot+ utility to
+  draw the dependency graph.
 
 An example that uses config files located in the toplevel directory and
 in your $HOME:
@@ -196,6 +198,23 @@ supported.
 
 --------------------------------
 BR2_GRAPH_OUT=svg make graph-depends
+--------------------------------
+
+The +graph-depends+ behaviour can be controlled by setting options in the
++BR2_GRAPH_DEPS_OPTS+ environment variable. The accepted options are:
+
+* +--depth N+, +-d N+, to limit the dependency depth to +N+ levels. The
+  default, +0+, means no limit.
+
+* +--transitive+, +--no-transitive+, to draw (or not) the transitive
+  dependencies. The default is to not draw transitive dependencies.
+
+* +--colours R,T,H+, the comma-separated list of colours to draw the
+  root package (+R+), the target packages (+T+) and the host packages
+  (+H+). Defaults to: +lightblue,grey,gainsboro+
+
+--------------------------------
+BR2_GRAPH_DEPS_OPTS='-d 3 --no-transitive --colours=red,green,blue' make graph-depends
 --------------------------------
 
 === Graphing the build duration

@@ -5,7 +5,7 @@
 ################################################################################
 
 PYTHON_VERSION_MAJOR = 2.7
-PYTHON_VERSION       = $(PYTHON_VERSION_MAJOR).6
+PYTHON_VERSION       = $(PYTHON_VERSION_MAJOR).7
 PYTHON_SOURCE        = Python-$(PYTHON_VERSION).tar.xz
 PYTHON_SITE          = http://python.org/ftp/python/$(PYTHON_VERSION)
 PYTHON_LICENSE       = Python software foundation license v2, others
@@ -153,7 +153,6 @@ PYTHON_POST_PATCH_HOOKS += PYTHON_TOUCH_GRAMMAR_FILES
 # idle & smtpd.py have bad shebangs and are mostly samples
 #
 define PYTHON_REMOVE_USELESS_FILES
-	rm -f $(TARGET_DIR)/usr/bin/idle
 	rm -f $(TARGET_DIR)/usr/bin/python$(PYTHON_VERSION_MAJOR)-config
 	rm -f $(TARGET_DIR)/usr/bin/python2-config
 	rm -f $(TARGET_DIR)/usr/bin/python-config

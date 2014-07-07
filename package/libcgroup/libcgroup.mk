@@ -4,9 +4,9 @@
 #
 ################################################################################
 
-LIBCGROUP_VERSION = 0.38
+LIBCGROUP_VERSION = 0.41
 LIBCGROUP_SOURCE = libcgroup-$(LIBCGROUP_VERSION).tar.bz2
-LIBCGROUP_SITE = http://downloads.sourceforge.net/project/libcg/libcgroup/v.038
+LIBCGROUP_SITE = http://downloads.sourceforge.net/project/libcg/libcgroup/v$(LIBCGROUP_VERSION)
 LIBCGROUP_LICENSE = LGPLv2.1
 LIBCGROUP_LICENSE_FILES = COPYING
 LIBCGROUP_DEPENDENCIES = host-bison host-flex
@@ -16,8 +16,8 @@ LIBCGROUP_INSTALL_STAGING = YES
 # large file support. See https://bugzilla.redhat.com/show_bug.cgi?id=574992
 # for more information.
 LIBCGROUP_CONF_ENV = \
-	CXXFLAGS+="-U_FILE_OFFSET_BITS" \
-	CFLAGS+="-U_FILE_OFFSET_BITS"
+	CXXFLAGS="$(TARGET_CXXFLAGS) -U_FILE_OFFSET_BITS" \
+	CFLAGS="$(TARGET_CFLAGS) -U_FILE_OFFSET_BITS"
 
 LIBCGROUP_CONF_OPT = \
 	--disable-tools \

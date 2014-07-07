@@ -14,6 +14,10 @@ ifneq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
 	POSTGRESQL_CONF_OPT += --disable-thread-safety
 endif
 
+ifeq ($(BR2_microblazeel)$(BR2_microblazebe),y)
+	POSTGRESQL_CONF_OPT += --disable-spinlocks
+endif
+
 ifeq ($(BR2_PACKAGE_READLINE),y)
 	POSTGRESQL_DEPENDENCIES += readline
 else
@@ -29,6 +33,9 @@ endif
 ifeq ($(BR2_PACKAGE_TZDATA),y)
 	POSTGRESQL_DEPENDENCIES += tzdata
 	POSTGRESQL_CONF_OPT += --with-system-tzdata=/usr/share/zoneinfo
+else
+	POSTGRESQL_DEPENDENCIES += host-zic
+	POSTGRESQL_CONF_ENV += ZIC=$$(ZIC)
 endif
 
 ifeq ($(BR2_PACKAGE_OPENSSL),y)

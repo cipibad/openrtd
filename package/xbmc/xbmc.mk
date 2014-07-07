@@ -4,19 +4,30 @@
 #
 ################################################################################
 
-XBMC_VERSION = 12.3-Frodo
-XBMC_SITE = $(call github,xbmc,xbmc,$(XBMC_VERSION))
+XBMC_VERSION = 13.1-Gotham
+XBMC_SOURCE = $(XBMC_VERSION).tar.gz
+XBMC_SITE = https://github.com/xbmc/xbmc/archive
 XBMC_LICENSE = GPLv2
 XBMC_LICENSE_FILES = LICENSE.GPL
 # XBMC needs host-sdl_image (and therefore host-sdl) for a host tools it builds
 # called TexturePacker. It is responsible to take all the images used in the
 # GUI and pack them in a blob.
 # http://wiki.xbmc.org/index.php?title=TexturePacker
-XBMC_DEPENDENCIES = host-gawk host-gperf host-infozip host-lzo host-sdl_image host-swig
+XBMC_DEPENDENCIES = host-gawk host-gettext host-gperf host-infozip host-lzo host-sdl_image host-swig
 XBMC_DEPENDENCIES += boost bzip2 expat flac fontconfig freetype jasper jpeg \
 	libass libcdio libcurl libegl libfribidi libgcrypt libgles libmad libmodplug libmpeg2 \
-	libogg libplist libpng libsamplerate libungif libvorbis libxml2 lzo ncurses \
+	libogg libplist libpng libsamplerate libungif libvorbis libxml2 libxslt lzo ncurses \
 	openssl pcre python readline sqlite taglib tiff tinyxml yajl zlib
+
+# xbmc@i386 depends on nasm
+XBMC_DEPENDENCIES += $(if $(BR2_i386),host-nasm)
+
+# ffmpeg depends on yasm on MMX archs
+# xbmc configure passes $(BR2_ARCH) to ffmpeg configure which adds
+# yasm as dependency for x86_64, even if BR2_x86_generic=y
+ifneq ($(BR2_X86_CPU_HAS_MMX)$(BR2_x86_64),)
+XBMC_DEPENDENCIES += host-yasm
+endif
 
 XBMC_CONF_ENV = \
 	PYTHON_VERSION="$(PYTHON_VERSION_MAJOR)" \
@@ -27,6 +38,7 @@ XBMC_CONF_ENV = \
 	TEXTUREPACKER_NATIVE_ROOT="$(HOST_DIR)/usr"
 
 XBMC_CONF_OPT +=  \
+	--with-arch=$(BR2_ARCH) \
 	--disable-alsa \
 	--disable-crystalhd \
 	--disable-debug \
@@ -53,7 +65,8 @@ ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
 XBMC_DEPENDENCIES += rpi-userland
 XBMC_CONF_OPT += --with-platform=raspberry-pi --enable-player=omxplayer
 XBMC_CONF_ENV += INCLUDES="-I$(STAGING_DIR)/usr/include/interface/vcos/pthreads \
-	-I$(STAGING_DIR)/usr/include/interface/vmcs_host/linux"
+	-I$(STAGING_DIR)/usr/include/interface/vmcs_host/linux" \
+	LIBS="-lvcos -lvchostif"
 endif
 
 ifeq ($(BR2_PACKAGE_DBUS),y)
@@ -117,7 +130,7 @@ XBMC_CONF_OPT += --disable-avahi
 endif
 
 ifeq ($(BR2_PACKAGE_XBMC_LIBCEC),y)
-XBMC_DEPENDENCIES += libcec
+XBMC_DEPENDENCIES += libcec udev
 XBMC_CONF_OPT += --enable-libcec
 else
 XBMC_CONF_OPT += --disable-libcec
@@ -127,9 +140,13 @@ ifeq ($(BR2_PACKAGE_XBMC_WAVPACK),y)
 XBMC_DEPENDENCIES += wavpack
 endif
 
+ifeq ($(BR2_PACKAGE_XBMC_LIBTHEORA),y)
+XBMC_DEPENDENCIES += libtheora
+endif
+
 # Add HOST_DIR to PATH for codegenerator.mk to find swig
 define XBMC_BOOTSTRAP
-	cd $(@D) && PATH=$(BR_PATH) AUTOPOINT=/bin/true ./bootstrap
+	cd $(@D) && PATH=$(BR_PATH) ./bootstrap
 endef
 XBMC_PRE_CONFIGURE_HOOKS += XBMC_BOOTSTRAP
 
