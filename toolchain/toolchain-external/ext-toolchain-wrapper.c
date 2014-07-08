@@ -40,7 +40,9 @@ static char sysroot[PATH_MAX];
 
 static char *predef_args[] = {
 	path,
+#ifdef BR2_TOOLCHAIN_EXTERNAL_SUPPORTS_SYSROOT
 	"--sysroot", sysroot,
+#endif /* defined BR2_TOOLCHAIN_EXTERNAL_SUPPORTS_SYSROOT */
 #ifdef BR_ABI
 	"-mabi=" BR_ABI,
 #endif

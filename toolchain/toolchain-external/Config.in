@@ -859,6 +859,12 @@ config BR2_TOOLCHAIN_EXTERNAL_CUSTOM
 
 endchoice
 
+config BR2_TOOLCHAIN_EXTERNAL_SUPPORTS_SYSROOT
+        bool "Toolchain supports sysroot"
+        depends on BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED
+        help
+          Select this only if external toolchain supports sysroot
+
 choice
 	prompt "Toolchain origin"
 	# Keep compatibility with old defconfig files that are using
