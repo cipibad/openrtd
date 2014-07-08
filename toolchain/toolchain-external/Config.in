@@ -859,6 +859,12 @@ config BR2_TOOLCHAIN_EXTERNAL_CUSTOM
 
 endchoice
 
+config BR2_TOOLCHAIN_EXTERNAL_DO_NOT_STRIP_PTHREAD_LIB
+        bool "Toolchain cannot strip libpthread.so"
+        depends on BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED
+        help
+          Select this if external toolchain cannot strip libpthread.so
+
 config BR2_TOOLCHAIN_EXTERNAL_SUPPORTS_SYSROOT
         bool "Toolchain supports sysroot"
         depends on BR2_TOOLCHAIN_EXTERNAL_PREINSTALLED

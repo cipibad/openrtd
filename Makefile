@@ -590,8 +590,10 @@ endif
 # besides the one in which crash occurred; or SIGTRAP kills my program when
 # I set a breakpoint"
 ifeq ($(BR2_TOOLCHAIN_HAS_THREADS),y)
+ifneq ($(BR2_TOOLCHAIN_EXTERNAL_DO_NOT_STRIP_PTHREAD_LIB),y)
 	find $(TARGET_DIR)/lib -type f -name 'libpthread*.so*' | \
 		xargs -r $(STRIPCMD) $(STRIP_STRIP_DEBUG)
+endif
 endif
 
 	mkdir -p $(TARGET_DIR)/etc
